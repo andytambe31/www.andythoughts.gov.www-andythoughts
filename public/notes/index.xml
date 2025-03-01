@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Notes on My New Hugo Site</title>
+    <title>Notes on www.andythoughts.gov.www-andythoughts</title>
     <link>http://localhost:1313/notes/</link>
-    <description>Recent content in Notes on My New Hugo Site</description>
+    <description>Recent content in Notes on www.andythoughts.gov.www-andythoughts</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 17 Feb 2025 00:31:12 -0500</lastBuildDate>
+    <lastBuildDate>Fri, 28 Feb 2025 14:43:47 -0500</lastBuildDate>
     <atom:link href="http://localhost:1313/notes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Indexed Minimum Priority Queue</title>
+      <link>http://localhost:1313/notes/queues/index-min-pq/</link>
+      <pubDate>Fri, 28 Feb 2025 14:43:47 -0500</pubDate>
+      <guid>http://localhost:1313/notes/queues/index-min-pq/</guid>
+      <description>&lt;p&gt;Indexed Minimum Priority Queue is a data structure that manages a set of values, which will be referred to as &lt;code&gt;keys&lt;/code&gt;, each associated with a unique index between 0 and maxN - 1, to be specified by the client.&lt;/p&gt;&#xA;&lt;p&gt;It allows inserting keys, removing the smallest key, updating a key, and deleting a key. The index lets the user refer to a specific key when making changes to the priority queue.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Github Workflows</title>
+      <link>http://localhost:1313/notes/github-workflows/</link>
+      <pubDate>Mon, 17 Feb 2025 11:28:24 -0500</pubDate>
+      <guid>http://localhost:1313/notes/github-workflows/</guid>
+      <description>&lt;h1 id=&#34;quickstart-github-actions&#34;&gt;Quickstart Github Actions&lt;/h1&gt;&#xA;&lt;p&gt;Github Actions is a Continuous Integration and continuous delivery (CI/CD) platform that allows you to automated build, test and deployment pipeline.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Beer Me</title>
+      <link>http://localhost:1313/notes/beer-me/</link>
+      <pubDate>Mon, 17 Feb 2025 11:16:41 -0500</pubDate>
+      <guid>http://localhost:1313/notes/beer-me/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Event Streaming</title>
       <link>http://localhost:1313/notes/event-streaming/</link>

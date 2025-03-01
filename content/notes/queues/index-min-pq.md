@@ -44,13 +44,13 @@ The `pq` array represents a [**binary heap**](https://en.wikipedia.org/wiki/Bina
 In the snippet below, key `k` is stored in `keys[i]`, `i` is added to `pq` in heap order after `swim()` operation is performed, and `qp` tracks `i`’s position within `pq`.
 
 ```java
-public void insert(int i, Key key){
+public void insert(int i, Item item){
     if(contains(i)) throw new IllegalArgumentException("index is already in the priority queue");
-    n++;
     qp[i] = n;
     pq[n] = i;
-    keys[i] = key;
-    swim(n);
+    items[i] = item;
+    n++;
+    swim(n - 1); // As the pq stores values from 0 to N - 1
 }
 ```
 
@@ -59,17 +59,15 @@ For deleting the minimum key and returning its index `i`, we can use the `delMin
 ```java
 public int delMin() {
     if (n == 0) throw new NoSuchElementException("Priority queue underflow");
-    
-    int min = pq[0];    // Store the index of the minimum key
-    exch(0, n - 1);     // Swap root with the last element
-    n--;                // Reduce the size of the heap
-    sink(0);            // Restore heap order
 
-    qp[min] = -1;       // Mark index as deleted
-    pq[n] = -1;         // Clear stale reference (was pq[n+1])
-    keys[min] = null;   // Help garbage collection
-
-    return min;         // Return the removed index
+    int min = pq[0];
+    exch(0, n - 1);
+    n--;
+    sink(0);
+    qp[min] = -1;
+    pq[n] = -1;
+    items[min] = null;
+    return min;
 }
 ```
 
@@ -140,5 +138,142 @@ minKey()
 ```java
 public Key minKey(){
     return keys[minIndex()];
+}
+```
+
+### Keys to be stored
+
+If we take the following sample input, where `Key`s are `String` values:
+
+```java
+String[] strings = { "it", "was", "the", "best", "of", "times", "it", "was", "the", "worst" };
+```
+
+The expected priority order for the given sequence is:
+
+```md
+"best" < "it" < "it" < "of" < "the" < "the" < "times" < "was" < "was" < "worst"
+```
+
+The resulting priority queue summary is:
+
+```
+Priority Queue Items
+0 -> it	1 -> was	2 -> the	3 -> best	4 -> of	5 -> times	6 -> it	7 -> was	8 -> the	9 -> worst	
+
+Priority Queue pq
+0 -> 3	1 -> 0	2 -> 4	3 -> 6	4 -> 8	5 -> 5	6 -> 2	7 -> 7	8 -> 1	9 -> 9	
+```
+
+### Source Code
+
+```java
+package dev.aniruddhatambe.queues;
+
+public class IndexMinPQ<Item extends Comparable<Item>> {
+    private int n;
+    private int[] pq;
+    private int[] qp;
+    private Item[] items;
+
+    public IndexMinPQ(int maxN) {
+        if(maxN <= 0) throw new IllegalArgumentException();
+        n = 0;
+        pq = new int[maxN];
+        qp = new int[maxN];
+        items = (Item[]) new Comparable[maxN];
+        for(int i = 0; i < maxN; i++)
+            qp[i] = -1;
+    }
+
+    public void insert(int i, Item item){
+        if(contains(i)) throw new IllegalArgumentException("index is already in the priority queue");
+        qp[i] = n;
+        pq[n] = i;
+        items[i] = item;
+        n++;
+        swim(n - 1);
+    }
+
+    public int delMin(){
+        int min = pq[0];
+        exch(0, n - 1);
+        n--;
+        sink(0);
+        qp[min] = -1;
+        pq[n] = -1;
+        items[min] = null;
+        return min;
+    }
+
+    public void changeKey(int i, Item item){
+        if(!contains(i)) throw new IllegalArgumentException("index is not in the priority queue");
+        items[i] = item;
+        sink(qp[i]);
+        swim(qp[i]);
+    }
+
+    public void decreaseKey(int i, Item item){
+        if(!contains(i)) throw new IllegalArgumentException("index is not in the priority queue");
+        if(items[i].compareTo(item) <= 0) throw new IllegalArgumentException("Calling decreaseKey() with a key equal or greater to the key in the priority queue");
+        items[i] = item;
+        sink(qp[i]);
+    }
+
+    public void increaseKey(int i, Item item){
+        if(!contains(i)) throw new IllegalArgumentException("index is not in the priority queue");
+        if (items[i].compareTo(item) >= 0) throw new IllegalArgumentException("Calling increaseKey() with a key equal or smaller to the key in the priority queue");
+        items[i] = item;
+        sink(qp[i]);
+    }
+
+    private void sink(int k){
+        while(2 * k + 1 < n){
+            int j = 2 * k + 1;
+            if(j + 1 < n && greater(j, j+1)) j++;
+            if(!greater(k, j)) break;
+            exch(k, j);
+            k = j;
+        }
+    }
+
+    public boolean contains(int i){
+        return qp[i] != -1;
+    }
+
+    private void swim(int k){
+        while(k > 0 && k < n && greater(k/2, k)){
+            exch(k,k/2);
+            k = k/2;
+        }
+    }
+
+    // All internal helper functions receive pq indices
+    private boolean greater(int i, int j){
+        return items[pq[i]].compareTo(items[pq[j]]) > 0;
+    }
+
+    private void exch(int i, int j){
+        int swap = pq[i];
+        pq[i] = pq[j];
+        pq[j] = swap;
+        qp[pq[i]] = i; // qp[pq[i]] = pq[qp[i]] = i must be true
+        qp[pq[j]] = j;
+    }
+
+    public void summary(){
+        System.out.println("Priority Queue Items");
+        for(int i = 0; i < n; i++)
+            System.out.print(i + " -> " + items[i] + "\t" );
+
+        System.out.println("\n\nPriority Queue pq");
+        for(int i = 0; i < n; i++)
+            System.out.print(i + " -> " + pq[i]  + "\t");
+
+        System.out.println("\n\nPriority Queue qp");
+        for(int i = 0; i < n; i++)
+            System.out.print(i + " -> " + qp[i]  + "\t");
+
+    }
 }
 ```
