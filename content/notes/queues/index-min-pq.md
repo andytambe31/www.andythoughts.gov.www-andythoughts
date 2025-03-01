@@ -1,6 +1,6 @@
 +++
 date = '2025-02-28T14:43:47-05:00'
-draft = true
+draft = false
 title = 'Indexed Minimum Priority Queue'
 +++
 
@@ -74,6 +74,31 @@ public int delMin() {
 ```
 
 For changing the key associated with item `i`, we can use the `change(i, newKey)` operation.
+
+```java
+public void changeKey(int i, Key key){
+    if (!contains(i)) throw new NoSuchElementException("index is not in the priority queue");
+    keys[i] = key;
+    swim(qp[i]);
+    sink(qp[i]);
+}
+```
+
+To decrease the key associated with index `i`, we use `decreaseKey(i, newKey)`. The key difference between `changeKey()` and `decreaseKey()` is that in `decreaseKey()`, the `newKey` must be strictly smaller than the current key. As a result, the key moves up in the heap to maintain the min-heap property, making it optimized to perform only the `swim()` operation.
+
+```java
+public void decreaseKey(int i, Key newKey){
+    if(!contains(i)) throw new IllegalArgumentException("index is not in the priority queue");
+
+    if(keys[i].compareTo(key) == 0)
+        throw new IllegalArgumentException("Calling decreaseKey() with a key equal to the key in the priority queue");
+    else if(keys[i].compareTo(key) < 0 )
+        throw new IllegalArgumentException("Calling decreaseKey() with a key equal to the key in the priority queue");
+
+    keys[i] = key;
+    swim(qp[i]);
+}
+```
 
 Additional APIs of the Indexed Minimum Priority Queue are,
 
