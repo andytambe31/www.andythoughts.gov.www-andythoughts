@@ -213,8 +213,128 @@ class Solution {
 }
 ```
 
-### [Clone Graph](https://leetcode.com/problems/clone-graph/description/?envType=problem-list-v2&envId=oizxjoit)
+### [Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/description/?envType=problem-list-v2&envId=oizxjoit)
 
 > Difficulty: Medium
 
-Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph. Each node in the graph contains a value(int) and a list(List\<Node>) of its neighbors.
+You have a graph of n nodes labeled from 0 to n - 1. You are given an integer n and a list of edges where edges[i] = [ai, bi] indicates that there is an undirected edge between nodes ai and bi in the graph.
+
+Return true if the edges of the given graph make up a valid tree, and false otherwise.
+
+**Solution**
+
+This question is essentially asking us to confirm that the graph is a single connected component and contains no cycles. Both validations can be performed using `dfs()` from the 0th node.
+
+**Auxilary Data Structure**
+- Build an adjacency list array `adj` to model the edges between nodes
+- boolean array `visited` to track all visited nodes
+
+```java
+List<Integer>[] adj = new ArrayList[n]; // n - number of nodes
+boolean[] visited = new boolean[n];
+```
+
+> Just constructing the adjancency list isn't enough, we must initialize for each index within the array.
+
+```java
+for(int i = 0; i < n; i++)
+    adj[i] = new ArryayList<Integer>();
+```
+
+**Mapping edges**
+
+Each edge in the list connects two nodes, represented by `edge[0]` and `edge[1]`.
+
+```java
+for(int[] edge: edges){
+    adj[edge[0]].add(edge[1]);
+    adj[edge[1]].add(edge[0]);
+}
+```
+
+**Starting DFS**
+
+We choose source node for dfs traversal as `0`. Since, this is going to be recursive function, we must pass the references to the following,
+
+- Adjacency List (adj)
+- Boolean Tracker array (visited)
+- parent node (initially set to -1)
+- current node in traversal ( initially set 0)
+
+```java
+dfs(adj, visited, -1, 0)
+```
+
+**Depth First Search**
+
+This DFS implementation checks for cycles by detecting back edges. In a graph with a cycle, back edges exist, allowing traversal to a previously visited node through a different unvisited edge. This characteristic is what defines a back edge.
+
+```java
+private void dfs(List<Integer>[] adj,boolean[] visited, int parent, int v){
+    visited[v] = true;
+    for(int w: adj[v]){
+        if(!visited[w]){
+            dfs(adj, visited, v, w);
+        }
+        else if( w != parent){
+            this.valid = false;
+            return;
+        }
+    }
+}
+```
+
+**Detecting Multiple components**
+
+Once `dfs(0)` completes, all nodes connected to it will be marked as visited, leaving any unvisited nodes from separate components. Therefore, we simply need to check if any node remains unvisited.
+
+```java
+for (boolean v : visited) 
+    if (!v) return false;
+```
+
+Finally, if all checks are successfully met, we can confirm that the graph is valid.
+
+**Source Code**
+```java
+class Solution {
+    private boolean valid = true;
+
+    public boolean validTree(int n, int[][] edges) {
+        if(edges.length != n - 1) return false;
+
+        List<Integer>[] adj = new ArrayList[n];
+        boolean[] visited = new boolean[n];
+
+        for(int i = 0; i < adj.length; i++)
+            adj[i] = new ArrayList<Integer>();
+        
+        for(int[] edge: edges){
+            adj[edge[0]].add(edge[1]);
+            adj[edge[1]].add(edge[0]);
+        }
+
+        dfs(adj, visited, -1, 0);
+
+        // Check if there any components present in the graph
+        for (boolean v : visited) {
+            if (!v) return false;
+        }
+
+        return this.valid;
+    }
+
+    private void dfs(List<Integer>[] adj,boolean[] visited, int parent, int v){
+        visited[v] = true;
+        for(int w: adj[v]){
+            if(!visited[w]){
+                dfs(adj, visited, v, w);
+            }
+            else if( w != parent){
+                this.valid = false;
+                return;
+            }
+        }
+    }
+}
+```
