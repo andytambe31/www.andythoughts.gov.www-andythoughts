@@ -174,6 +174,7 @@ return s.substring(ans[0], ans[1] + 1); // substring in java [i, j), doesn't inc
 ```
 
 **Source code**
+
 ```java
 class Solution {
     public String longestPalindrome(String s) {
@@ -226,6 +227,7 @@ Return true if the edges of the given graph make up a valid tree, and false othe
 This question is essentially asking us to confirm that the graph is a single connected component and contains no cycles. Both validations can be performed using `dfs()` from the 0th node.
 
 **Auxilary Data Structure**
+
 - Build an adjacency list array `adj` to model the edges between nodes
 - boolean array `visited` to track all visited nodes
 
@@ -296,6 +298,7 @@ for (boolean v : visited)
 Finally, if all checks are successfully met, we can confirm that the graph is valid.
 
 **Source Code**
+
 ```java
 class Solution {
     private boolean valid = true;
@@ -335,6 +338,156 @@ class Solution {
                 return;
             }
         }
+    }
+}
+```
+
+### [Clone Graph](https://leetcode.com/problems/clone-graph/?envType=problem-list-v2&envId=oizxjoit)
+
+> Difficulty: Medium
+
+Given a reference of a node in a connected undirected graph. Return a deep copy (clone) of the graph.
+
+Each node in the graph contains a value (int) and a list (List[Node]) of its neighbors.
+
+```java
+class Node {
+    public int val;
+    public List<Node> neighbors;
+}
+```
+
+**Solution**
+
+This algorithm **clones an undirected graph** using **Depth-First Search (DFS)** and a **HashMap** to track visited nodes. It recursively creates a copy of each node and its neighbors while avoiding cycles. If a node has already been cloned, it returns the existing copy from the `visited` map. This ensures efficient cloning with a time complexity of **O(V + E)**. 🚀
+
+```java
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public List<Node> neighbors;
+    public Node() {
+        val = 0;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val) {
+        val = _val;
+        neighbors = new ArrayList<Node>();
+    }
+    public Node(int _val, ArrayList<Node> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+}
+*/
+class Solution {
+    private Map<Node, Node> visited = new HashMap();
+
+    public Node cloneGraph(Node node) {
+        if(node == null) return node;
+
+        if(visited.containsKey(node)) 
+            return visited.get(node);
+
+        Node v = new Node(node.val, new ArrayList<>());
+        
+        for(Node w: node.neighbors)
+            v.neighbors.add(cloneGraph(w));
+
+        return v;
+    }
+}
+```
+
+### [Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/description/?envType=problem-list-v2&envId=oizxjoit)
+
+Given the head of a linked list, remove the nth node from the end of the list and return its head.
+
+**Solution**
+
+We could use a solution with two pointers, the first pointer advances the list by `n + 1` steps from the beginning, while the second pointer starts from the beginning of the list.
+
+We now must maintain the constant gap by advancing both pointers together until the first pointer arrives past the last node. The second pointer will be pointing at the `nth` node counting from the last.
+
+We relink the next pointer of the node reference by the second pointer to point to the node's next node.
+
+**Shifting the first**
+
+In order for the second pointer to be exactly one node before the node to be deleted, we must move first only n + 1 steps ahead. The reason behind this decision is that we can then simply perform, `second.next = second.next.next`. If we move first only `n` steps ahead, second will stop on the node we want to remove, making the deletion harder.
+
+```java
+for(int i = 0; i <= n; i++)  // this leads to an iteration of n + 1
+    first = first.next;
+```
+
+**Traversing beyond last node**
+
+After gap of `n+1` is achieved between first & second node, we must start the traversal of second & first towards the end. Be advised, we want first to go beyond the last node, so we'll only check if `first != null`.
+
+```java
+while(first != null){
+    first = first.next;
+    second = second.next;
+}
+```
+
+Now, second is right before the node to removed. Thus we can simply perform, the `second.next = second.next.next`.
+
+**Need for dummy node**
+
+There is a scenario where the LinkedList contains only 1 node, and the value of n is also 1. In that case we want to create a dummy node to point to head, and start the iteration from it.
+
+```java
+ListNode dummy = new ListNode(0);
+dummy.next = head;
+
+ListNode first = dummy;
+ListNode second = dummy;
+```
+
+**Source Code**
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        // Dummy node to handle edge cases
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        ListNode first = dummy;
+        ListNode second = dummy;
+
+        // Move `first` pointer `n+1` steps ahead
+        for (int i = 0; i <= n; i++) {
+            first = first.next;
+        }
+
+        // Move `first` & `second` until `first` reaches the end
+        while (first != null) {
+            first = first.next;
+            second = second.next;
+        }
+
+        // If we are removing the first node, return second.next directly
+        if (second.next == head && n == 1) {
+            return null;
+        }
+
+        // Remove the nth node
+        second.next = second.next.next;
+
+        return dummy.next; // Return updated head
     }
 }
 ```
